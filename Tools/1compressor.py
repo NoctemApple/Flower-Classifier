@@ -4,10 +4,10 @@ import os
 print("compressing...")
 
 # Set the directory where the images are located
-data_dir = r'C:\Users\Joshua\Desktop\sun'
+data_dir = r'C:\Users\Joshua\Desktop\tul'
 
 # Set the directory to save the compressed images
-output_dir = r'C:\Users\Joshua\Desktop\augsun'
+output_dir = r'C:\Users\Joshua\Desktop\augtul'
 
 # Create the output directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)

@@ -2,10 +2,10 @@ import os
 import shutil
 
 # Set the directory where the original images are located
-data_dir = r'C:\Users\Joshua\Desktop\reros'
+data_dir = r'C:\Users\Joshua\Desktop\retul'
 
 # Set the directory to save the renamed images
-output_dir = r'C:\Users\Joshua\Desktop\rose'
+output_dir = r'C:\Users\Joshua\Desktop\tulip'
 
 # Create the output directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)

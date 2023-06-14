@@ -13,34 +13,33 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier 
+
+def classify_image():
+    # Open file dialog to select an image
+    file_path = filedialog.askopenfilename()
+    
+    # Load and preprocess the selected image
+    img = Image.open(file_path)
+    img = img.resize((50, 50))
+    img = np.array(img)
+    img = img.flatten()
+    img = img.reshape(1, -1)
+    img_scaled = scaler.transform(img)
+    
+    # Make prediction using the trained model
+    prediction = best_estimator.predict(img_scaled)
+    
+    # Update the predicted label on the GUI
+    predicted_label_text.set(categories[prediction[0]])
 
 print("Running...")
 
-def classify_image():
-    # Open file dialog to choose an image
-    file_path = filedialog.askopenfilename(title="Select an image", filetypes=(("Image files", "*.png;*.jpg;*.jpeg"), ("All files", "*.*")))
-    if file_path:
-        # Load and preprocess the image
-        img = imread(file_path)
-        img = resize(img, (50, 50))
-        img_flattened = img.flatten()
-
-        # Classify the image using the best estimator
-        prediction = best_estimator.predict([img_flattened])[0]
-
-        # Update the prediction label in the GUI
-        predicted_label_text.set(f"Predicted Label: {categories[prediction]}")
-
-        # Display the selected image
-        image = Image.open(file_path)
-        image = image.resize((200, 200))
-        photo = ImageTk.PhotoImage(image)
-        image_label.configure(image=photo)
-        image_label.image = photo
-
 # prepare data
 input_dir = r'C:\Users\Joshua\Desktop\Flowers'
-categories = ['gumamela', 'sunflower', 'tulip', 'sampaguita']
+categories = ['gumamela', 'sunflower', 'tulip', 'sampaguita', 'rose', 'chrysanthemum']
 
 if not os.path.exists(input_dir):
     print(f"Directory '{input_dir}' does not exist.")
@@ -61,14 +60,15 @@ start_time = time.time()  # Start measuring the execution time
 with tqdm(total=total_files, desc="Processing Images") as pbar:
     for category_idx, category in enumerate(categories):
         for file in os.listdir(os.path.join(input_dir, category)):
-            img_path = os.path.join(input_dir, category, file)
-            img = imread(img_path)
-            img = resize(img, (50, 50))
-            data.append(img.flatten())
-            labels.append(category_idx)
-
-            # Update the progress bar
-            pbar.update(1)
+            if file.endswith(('.jpg','.jpeg')):
+                img_path = os.path.join(input_dir, category, file)
+                img = imread(img_path)
+                img = resize(img, (50, 50))
+                data.append(img.flatten())
+                labels.append(category_idx)
+                pbar.update(1)
+            else:
+                print(f"Skipping file '{file}' as it is not a valid image file.")
 
 data = np.asarray(data)
 labels = np.asarray(labels)
@@ -83,19 +83,58 @@ print("Splitting...")
 # train / test split
 x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True, stratify=labels)
 
+print("x_train shape:", x_train.shape)
+print("x_test shape:", x_test.shape)
+print("y_train shape:", y_train.shape)
+print("y_test shape:", y_test.shape)
+
+print("Scaling the data...")
+
+# Scale the data
+scaler = StandardScaler()
+x_train_scaled = scaler.fit_transform(x_train)
+x_test_scaled = scaler.transform(x_test)
+
+print("Handling missing values...")
+
+# Handle missing values
+imputer = SimpleImputer(strategy='mean')
+x_train_scaled = imputer.fit_transform(x_train_scaled)
+x_test_scaled = imputer.transform(x_test_scaled)
+
+print("x_train_scaled shape:", x_train_scaled.shape)
+print("y_train shape:", y_train.shape)
+
+print("Classifying...")
+
 # train classifier
-classifier = SVC()
+classifier = RandomForestClassifier()
 
-parameters = [{'gamma': [0.01, 0.001, 0.0001], 'C': [1, 10, 100, 1000]}]
+parameters = [
+    {'n_estimators': [100, 200, 300], 'max_depth': [None, 5, 10]},  # Parameter values for the first combination
+    {'n_estimators': [50, 100, 150], 'max_depth': [None, 3, 6]}  # Parameter values for the second combination
+    # Add more parameter combinations as needed
+]
 
-grid_search = GridSearchCV(classifier, parameters)
+start_time = time.time()  # Start measuring the execution time
 
-grid_search.fit(x_train, y_train)
+with tqdm(total=len(parameters), desc="Grid Search") as pbar:
+    grid_search = GridSearchCV(classifier, parameters)
+    grid_search.fit(x_train_scaled, y_train.astype(int))
+
+    # Update the progress bar
+    pbar.update(1)
+
+end_time = time.time()  # Stop measuring the execution time
+execution_time = end_time - start_time
+
+print(f"Grid search execution time: {execution_time} seconds")
+print("Testing Performance...")
 
 # test performance
 best_estimator = grid_search.best_estimator_
 
-y_prediction = best_estimator.predict(x_test)
+y_prediction = best_estimator.predict(x_test_scaled)
 
 score = accuracy_score(y_prediction, y_test)
 
