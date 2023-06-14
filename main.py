@@ -12,7 +12,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
-print("Loading...")
+print("Running...")
 
 def classify_image():
     # Open file dialog to choose an image
@@ -38,7 +38,7 @@ def classify_image():
 
 # prepare data
 input_dir = r'C:\Users\Joshua\Desktop\Flowers'
-categories = ['Gumamela', 'sunflower', 'tulip']
+categories = ['gumamela', 'sunflower', 'tulip', 'sampaguita']
 
 if not os.path.exists(input_dir):
     print(f"Directory '{input_dir}' does not exist.")
