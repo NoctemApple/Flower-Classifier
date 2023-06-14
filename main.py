@@ -1,5 +1,6 @@
 import os
 import pickle
+from tqdm import tqdm
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
@@ -46,15 +47,26 @@ if not os.path.exists(input_dir):
 
 print("Resizing...")
 
+
 data = []
 labels = []
+total_files = 0
+
+# Count the total number of files
 for category_idx, category in enumerate(categories):
-    for file in os.listdir(os.path.join(input_dir, category)):
-        img_path = os.path.join(input_dir, category, file)
-        img = imread(img_path)
-        img = resize(img, (50, 50))
-        data.append(img.flatten())
-        labels.append(category_idx)
+    total_files += len(os.listdir(os.path.join(input_dir, category)))
+
+with tqdm(total=total_files, desc="Processing Images") as pbar:
+    for category_idx, category in enumerate(categories):
+        for file in os.listdir(os.path.join(input_dir, category)):
+            img_path = os.path.join(input_dir, category, file)
+            img = imread(img_path)
+            img = resize(img, (50, 50))
+            data.append(img.flatten())
+            labels.append(category_idx)
+
+            # Update the progress bar
+            pbar.update(1)
 
 data = np.asarray(data)
 labels = np.asarray(labels)
