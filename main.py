@@ -44,18 +44,22 @@ if not os.path.exists(input_dir):
     print(f"Directory '{input_dir}' does not exist.")
     exit()
 
+print("Resizing...")
+
 data = []
 labels = []
 for category_idx, category in enumerate(categories):
     for file in os.listdir(os.path.join(input_dir, category)):
         img_path = os.path.join(input_dir, category, file)
         img = imread(img_path)
-        img = resize(img, (15, 15))
+        img = resize(img, (50, 50))
         data.append(img.flatten())
         labels.append(category_idx)
 
 data = np.asarray(data)
 labels = np.asarray(labels)
+
+print("Splitting...")
 
 # train / test split
 x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, shuffle=True, stratify=labels)
@@ -79,6 +83,8 @@ score = accuracy_score(y_prediction, y_test)
 print('{}% of samples were correctly classified'.format(str(score * 100)))
 
 pickle.dump(best_estimator, open('./model.p', 'wb'))
+
+print("Creating GUI...")
 
 # Create a Tkinter window
 window = tk.Tk()
