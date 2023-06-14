@@ -1,5 +1,6 @@
 import os
 import pickle
+import time
 from tqdm import tqdm
 import tkinter as tk
 from tkinter import filedialog
@@ -21,7 +22,7 @@ def classify_image():
     if file_path:
         # Load and preprocess the image
         img = imread(file_path)
-        img = resize(img, (15, 15))
+        img = resize(img, (50, 50))
         img_flattened = img.flatten()
 
         # Classify the image using the best estimator
@@ -47,7 +48,6 @@ if not os.path.exists(input_dir):
 
 print("Resizing...")
 
-
 data = []
 labels = []
 total_files = 0
@@ -55,6 +55,8 @@ total_files = 0
 # Count the total number of files
 for category_idx, category in enumerate(categories):
     total_files += len(os.listdir(os.path.join(input_dir, category)))
+
+start_time = time.time()  # Start measuring the execution time
 
 with tqdm(total=total_files, desc="Processing Images") as pbar:
     for category_idx, category in enumerate(categories):
@@ -70,6 +72,11 @@ with tqdm(total=total_files, desc="Processing Images") as pbar:
 
 data = np.asarray(data)
 labels = np.asarray(labels)
+
+end_time = time.time()  # Stop measuring the execution time
+execution_time = end_time - start_time
+
+print(f"Execution time: {execution_time} seconds")
 
 print("Splitting...")
 
