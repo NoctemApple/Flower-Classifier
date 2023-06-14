@@ -21,7 +21,7 @@ to wherever you put your dataset
 
 and
 
-categories = ['Gumamela', 'sunflower', 'tulip']
+categories = ['gumamela', 'sunflower', 'tulip']
 to whatever you name your folders.
 
 It should work without a hitch.
