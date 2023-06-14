@@ -2,10 +2,10 @@ import os
 import cv2
 
 # Set the directory where the original images are located
-data_dir = r'C:\Users\Joshua\Desktop\Sampaguita'
+data_dir = r'C:\Users\Joshua\Desktop\augros'
 
 # Set the directory to save the renamed images
-output_dir = r'C:\Users\Joshua\Desktop\AugSam'
+output_dir = r'C:\Users\Joshua\Desktop\reros'
 
 # Create the output directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)
