@@ -30,3 +30,8 @@ to whatever you name your folders.
 It should work without a hitch.
 
 Happy Classifying!
+
+
+Things to do:
+-improve accuracy (64-68%) is too low
+-fix problems that come with trying to fix accuracy
