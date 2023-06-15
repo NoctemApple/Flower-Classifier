@@ -6,10 +6,13 @@ This code is a combination of a youtube video which Ill link here:
 https://www.youtube.com/watch?v=il8dMDlXrIE
 and my best friend chatgpt helping me add features.
 
+Here is the flower dataset:
+https://drive.google.com/drive/folders/19S90PI1hD7vkQ1rSUiC8PUbUNPM7BhTN?usp=sharing
+
 Now to the actual code
 
-just download the Flowers folder it (as of june 15 2023 12:43am ph time)
-has 6 flowers that are found in the Philippines at the moment. (more will be added eventually)
+just download the Flowers folder it (as of June 15 10:59pm PH time)
+has 6 flowers that are found in the Philippines at the moment.
 
 Run the code, and select an image that you want classified.
 
