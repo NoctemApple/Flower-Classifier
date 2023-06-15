@@ -8,8 +8,8 @@ and my best friend chatgpt helping me add features.
 
 Now to the actual code
 
-just download the Flowers folder it (as of june 14 2023 12:43am ph time)
-has 3 flowers that are found in the Philippines at the moment. (more will be added eventually)
+just download the Flowers folder it (as of june 15 2023 12:43am ph time)
+has 6 flowers that are found in the Philippines at the moment. (more will be added eventually)
 
 Run the code, and select an image that you want classified.
 
