@@ -5,10 +5,10 @@ import numpy as np
 print("Augmenting beep beep...")
 
 # Set the directory where the original images are located
-data_dir = r'C:\Users\Joshua\Desktop\Sampaguita'
+data_dir = r'C:\Users\Joshua\Desktop\auggum'
 
 # Set the directory to save the augmented images
-output_dir = r'C:\Users\Joshua\Desktop\AugSam'
+output_dir = r'C:\Users\Joshua\Desktop\fligum'
 
 # Define the rotation angles
 rotation_angles = [90, 180, 270]
@@ -45,13 +45,13 @@ for image_file in os.listdir(data_dir):
         # cv2.imwrite(os.path.join(output_dir, 'flipped3_' + image_file), flipped_image3)
 
         # Add Gaussian noise to the images
-        mean = 0
-        stddev = 20  # Adjust the standard deviation to control the amount of noise
-        noise = np.random.normal(mean, stddev, image.shape).astype(np.uint8)
-        noisy_image = cv2.add(image, noise)
+        # mean = 0
+        # stddev = 20  # Adjust the standard deviation to control the amount of noise
+        # noise = np.random.normal(mean, stddev, image.shape).astype(np.uint8)
+        # noisy_image = cv2.add(image, noise)
 
-        # Save the augmented images
-        cv2.imwrite(os.path.join(output_dir, 'noisy_' + image_file), noisy_image)
+        # # Save the augmented images
+        # cv2.imwrite(os.path.join(output_dir, 'noisy_' + image_file), noisy_image)
 
             
     else:
