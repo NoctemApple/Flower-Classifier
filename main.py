@@ -78,20 +78,20 @@ print("Classifying...")
 
 # CNN model definition
 model = Sequential()
-model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3), kernel_regularizer=regularizers.l1(0.01)))
+model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 3), kernel_regularizer=regularizers.l1(0.001)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Conv2D(64, (3, 3), activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+model.add(Conv2D(64, (3, 3), activation='relu', kernel_regularizer=regularizers.l2(0.001)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Flatten())
-model.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+model.add(Dense(128, activation='relu', kernel_regularizer=regularizers.l2(0.001)))
 model.add(Dense(len(categories), activation='softmax'))
 
 # Compile the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 # Train the model
-batch_size = 64
-epochs = 10
+batch_size = 256
+epochs = 25
 model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)
 
 # Evaluate the model
