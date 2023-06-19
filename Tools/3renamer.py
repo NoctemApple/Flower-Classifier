@@ -23,3 +23,4 @@ for i, image_file in enumerate(sorted(os.listdir(data_dir))):
         os.rename(image_path, new_image_path)
 
 print("File names have been renamed successfully.")
+
