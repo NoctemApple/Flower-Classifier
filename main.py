@@ -9,8 +9,8 @@ from skimage.io import imread
 from skimage.transform import resize
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
-from sklearn.svm import SVC
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from sklearn.metrics import accuracy_score
 
 print("Loading...")
@@ -21,11 +21,12 @@ def classify_image():
     if file_path:
         # Load and preprocess the image
         img = imread(file_path)
-        img = resize(img, (15, 15))
-        img_flattened = img.flatten()
+        img_resized = resize(img, (15, 15))
+        img_reshaped = np.expand_dims(img_resized, axis=0)  # Reshape the image for CNN input
+        img_rgb = img_reshaped[..., :3]  # Keep only the RGB channels, discarding the alpha channel if present
 
-        # Classify the image using the best estimator
-        prediction = best_estimator.predict([img_flattened])[0]
+        # Classify the image using the CNN model
+        prediction = np.argmax(model.predict(img_rgb))
 
         # Update the prediction label in the GUI
         predicted_label_text.set(f"Predicted Label: {categories[prediction]}")
@@ -38,7 +39,7 @@ def classify_image():
         image_label.image = photo
 
 # prepare data
-input_dir = r'C:\Users\Joshua\Desktop\Flowers'
+input_dir = r'C:\Users\Joshua\Desktop\back up'
 categories = ["chrysanthemum", "gumamela", "rose", "sampaguita", "sunflower", "tulip"]
 
 if not os.path.exists(input_dir):
@@ -54,11 +55,16 @@ for category_idx, category in enumerate(categories):
         img_path = os.path.join(input_dir, category, file)
         img = imread(img_path)
         img = resize(img, (15, 15))
-        data.append(img.flatten())
+        data.append(img)  # Append the resized image directly
         labels.append(category_idx)
 
 data = np.asarray(data)
 labels = np.asarray(labels)
+
+# Convert grayscale images to 3 channels
+if data.ndim == 3:
+    data = np.expand_dims(data, axis=-1)
+    data = np.repeat(data, 3, axis=-1)
 
 print("Splitting...")
 
@@ -67,25 +73,29 @@ x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2,
 
 print("Classifying...")
 
-# train classifier
-classifier = SVC()
+# CNN model definition
+model = Sequential()
+model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(15, 15, 3)))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+model.add(Dense(len(categories), activation='softmax'))
 
-parameters = [{'gamma': [0.01, 0.001, 0.0001], 'C': [1, 10, 100, 1000]}]
+# Compile the model
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-grid_search = GridSearchCV(classifier, parameters)
+# Train the model
+batch_size = 32
+epochs = 10
+model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)
 
-grid_search.fit(x_train, y_train)
+# Evaluate the model
+_, test_accuracy = model.evaluate(x_test, y_test)
+print("Test Accuracy:", test_accuracy)
 
-# test performance
-best_estimator = grid_search.best_estimator_
-
-y_prediction = best_estimator.predict(x_test)
-
-score = accuracy_score(y_prediction, y_test)
-
-print('{}% of samples were correctly classified'.format(str(score * 100)))
-
-pickle.dump(best_estimator, open('./model.p', 'wb'))
+pickle.dump(model, open('./model.p', 'wb'))
 
 print("Creating GUI...")
 
