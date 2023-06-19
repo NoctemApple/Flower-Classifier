@@ -12,6 +12,8 @@ from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from sklearn.metrics import accuracy_score
+from imblearn.over_sampling import RandomOverSampler 
+from keras.applications import VGG16
 
 print("Loading...")
 
@@ -21,7 +23,7 @@ def classify_image():
     if file_path:
         # Load and preprocess the image
         img = imread(file_path)
-        img_resized = resize(img, (15, 15))
+        img_resized = resize(img, (64, 64))
         img_reshaped = np.expand_dims(img_resized, axis=0)  # Reshape the image for CNN input
         img_rgb = img_reshaped[..., :3]  # Keep only the RGB channels, discarding the alpha channel if present
 
@@ -54,7 +56,7 @@ for category_idx, category in enumerate(categories):
     for file in tqdm(os.listdir(os.path.join(input_dir, category))):
         img_path = os.path.join(input_dir, category, file)
         img = imread(img_path)
-        img = resize(img, (15, 15))
+        img = resize(img, (64, 64))
         data.append(img)  # Append the resized image directly
         labels.append(category_idx)
 
@@ -66,6 +68,14 @@ if data.ndim == 3:
     data = np.expand_dims(data, axis=-1)
     data = np.repeat(data, 3, axis=-1)
 
+print("Oversampling...")
+
+# Apply oversampling
+oversampler = RandomOverSampler()
+data_resampled, labels_resampled = oversampler.fit_resample(data.reshape(len(data), -1), labels)
+
+data_resampled = data_resampled.reshape(len(data_resampled), 64, 64, 3)
+
 print("Splitting...")
 
 # train / test split
@@ -73,22 +83,26 @@ x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size=0.2,
 
 print("Classifying...")
 
-# CNN model definition
+# Load the pre-trained VGG16 model
+base_model = VGG16(weights='imagenet', include_top=False, input_shape=(64, 64, 3))
+
+# Freeze the pre-trained layers
+for layer in base_model.layers:
+    layer.trainable = False
+
+# Create a new model on top of the pre-trained base
 model = Sequential()
-model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(15, 15, 3)))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(base_model)
 model.add(Flatten())
-model.add(Dense(128, activation='relu'))
+model.add(Dense(256, activation='relu'))
 model.add(Dense(len(categories), activation='softmax'))
 
 # Compile the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 # Train the model
-batch_size = 32
-epochs = 10
+batch_size = 64
+epochs = 12
 model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=1)
 
 # Evaluate the model
