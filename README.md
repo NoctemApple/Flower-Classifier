@@ -16,11 +16,21 @@ has 6 flowers that are found in the Philippines at the moment.
 
 Run the code, and select an image that you want classified.
 
+# How to Run
+
+run main.py first if model.h5 isn't there or if you made adjustments to the dataset or the training process
+
+then after run:
+streamlit run app.py
+
+Happy Classifying!
+
+# My notes
+
 TBH you can also just repurpose the code not just for flowers, as long as you have the clarity to
 change the following:
 
-input_dir = r'C:\Users\Joshua\Desktop\Flowers'
-to wherever you put your dataset
+input_dir = input_dir = './Flowers'
 
 and
 
@@ -29,9 +39,10 @@ to whatever you name your folders.
 
 It should work without a hitch.
 
-Happy Classifying!
+## Notes from the future
 
-
-Things to do:
--improve accuracy (64-68%) is too low
--fix problems that come with trying to fix accuracy
+Yes I came back to this project because I didn't expect it to not work at all on my laptop
+so severe changes had to be made to
+get it to work on my laptop including:
+- Using env becasue python incompatibility
+- Transition to Streamlit for selecting images (mac issue)
